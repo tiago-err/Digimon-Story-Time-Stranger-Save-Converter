@@ -16,10 +16,14 @@
     "productName": "DSTS Save Converter",
     "publish": null,
     "linux": {
-      "target": ["AppImage"]
+      "target": [
+        "AppImage"
+      ]
     },
     "win": {
-      "target": ["portable"]
+      "target": [
+        "portable"
+      ]
     }
   },
   "keywords": [],
@@ -27,12 +31,14 @@
   "license": "ISC",
   "devDependencies": {
     "crypto-js": "^4.2.0",
-    "electron": "^31.0.0",
-    "electron-builder": "^26.15.3",
-    "lz4js": "^0.2.0"
+    "electron": "^45.1.0",
+    "electron-builder": "^26.15.3"
   },
   "dependencies": {
     "adm-zip": "^0.6.0",
-    "lz4": "^0.6.5"
+    "lz4js": "^0.2.0"
+  },
+  "allowScripts": {
+    "electron@45.1.0": true
   }
 }

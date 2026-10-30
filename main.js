@@ -2,7 +2,7 @@ const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
-const lz4 = require('lz4');
+const lz4 = require('lz4js'); // ponytail: pure JS, no native rebuild per Electron/OS
 const AdmZip = require('adm-zip');
 
 const DSTS_KEY = Buffer.from('33393632373736373534353535383833', 'hex'); // 3962776754555883
@@ -99,7 +99,7 @@ ipcMain.handle('convert', async (event, args) => {
         const compressedPayload = inputMain.subarray(1024);
         
         const uncompressedPayload = Buffer.alloc(3097152);
-        const decodedSize = lz4.decodeBlock(compressedPayload, uncompressedPayload);
+        const decodedSize = lz4.decompressBlock(compressedPayload, uncompressedPayload, 0, compressedPayload.length, 0);
         
         if (decodedSize !== 3097152) {
             console.warn(`${file} - Uncompressed payload size mismatch: ${decodedSize}`);
@@ -123,9 +123,11 @@ ipcMain.handle('convert', async (event, args) => {
         
         const uncompressedPayload = decryptedPc.subarray(1024);
         
-        const bound = lz4.encodeBound(uncompressedPayload.length);
+        const bound = lz4.compressBound(uncompressedPayload.length);
         const compressedBuffer = Buffer.alloc(bound);
-        const compressedSize = lz4.encodeBlockHC(uncompressedPayload, compressedBuffer);
+        // ponytail: plain LZ4 (lz4js has no HC); any LZ4 decoder reads it, just slightly larger
+        const compressedSize = lz4.compressBlock(uncompressedPayload, compressedBuffer, 0, uncompressedPayload.length, new Uint32Array(65536));
+        if (compressedSize === 0) throw new Error(`${file}: LZ4 compression produced no output`);
         const compressedPayload = compressedBuffer.subarray(0, compressedSize);
         
         outputMain = Buffer.concat([header, compressedPayload]);
