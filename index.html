@@ -5,13 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DSTS Save Converter</title>
   <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="app-container">
     <header class="app-header">
       <h1>DSTS Save Converter</h1>
-      <p>Move your Digimon Story: Time Stranger progress between PC (Steam) and Nintendo Switch.</p>
+      <p class="tagline">Carry your journey across worlds.</p>
+      <p>Move your Digimon Story: Time Stranger progress between <span class="hl">PC (Steam)</span> and <span class="hl">Nintendo Switch</span>.</p>
+      <div class="circuit" aria-hidden="true"></div>
     </header>
 
     <div class="notice">
@@ -20,7 +22,7 @@
 
     <main class="main-content">
       <section class="card">
-        <h2><span class="step">1</span>Which way are you converting?</h2>
+        <h2 class="plate"><span class="step">1</span>Which way are you converting?</h2>
         <div class="direction-group" role="radiogroup">
           <label class="direction-option">
             <input type="radio" name="direction" value="switch-to-pc" checked>
@@ -36,7 +38,7 @@
       </section>
 
       <section class="card">
-        <h2><span class="step">2</span>Choose your files</h2>
+        <h2 class="plate"><span class="step">2</span>Choose your files</h2>
 
         <div class="field">
           <div class="field-row">
@@ -77,7 +79,7 @@
       </section>
 
       <section class="card">
-        <h2><span class="step">3</span>Convert and install</h2>
+        <h2 class="plate"><span class="step">3</span>Convert and install</h2>
         <ol id="after-steps" class="after-steps"></ol>
         <div class="action-container">
           <button id="btn-convert" class="btn convert-btn" disabled>Convert Saves</button>
@@ -99,6 +101,11 @@
         <p>Every <code>0000.bin</code>-style save and every <code>slot_0000.bin</code>-style slot file directly inside the input folder. Subfolders are not searched.</p>
       </details>
     </main>
+
+    <footer class="app-footer">
+      <div class="circuit flip" aria-hidden="true"></div>
+      <p>Unofficial fan-made tool. Not affiliated with or endorsed by Bandai Namco.</p>
+    </footer>
   </div>
   <script src="renderer.js"></script>
 </body>
