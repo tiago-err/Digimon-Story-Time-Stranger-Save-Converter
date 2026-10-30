@@ -3,54 +3,61 @@ WIP
 
 > **Note**: This is a "vibe coded" project, created dynamically through an AI pair programming session.
 
-This application allows you to convert save files for Digimon Story Time Stranger between the PC and Nintendo Switch versions.
+This application converts save files for Digimon Story: Time Stranger between the PC (Steam) and Nintendo Switch versions.
 
 **⚠️ IMPORTANT WARNING ⚠️**  
 PC to Switch save conversion is **untested** because not all DLC has been released for the Switch version of the game yet. Please proceed with caution and always back up your original saves!
 
 ## How to Use
 
-1. Launch the application (either run the executable or run from source).
-2. Use the UI to select your conversion direction:
-   - **Switch to PC**: Convert a Nintendo Switch JKSV backup folder into PC save files.
-   - **PC to Switch**: Convert PC save files into a Nintendo Switch JKSV backup ZIP file.
-3. Provide the necessary files/folders:
-   - **Input Folder**: Select the folder containing your original save files.
-   - **Output Folder**: Select the folder where you want the converted saves to be placed.
-   - **Original Switch Backup ZIP** (Only for PC to Switch): Select your original, unmodified Switch backup ZIP. This is required as a template to pack the converted saves into.
-4. Click **Convert** and wait for the process to finish. The app will notify you when conversion is successful and where to find your files.
+Launch the application (run the executable, or `npm start` from source). The app walks you through three steps and explains each field on screen.
+
+1. **Choose a direction**
+   - **Switch ➔ PC**: continue your Switch game on Steam.
+   - **PC ➔ Switch** *(untested)*: continue your Steam game on Switch.
+2. **Choose your files**
+
+   | Field | Switch ➔ PC | PC ➔ Switch |
+   |---|---|---|
+   | Input folder | Your JKSV backup folder for the game (if the backup is a ZIP, extract it first) | The game's `gamedata\savedata` folder on PC, or a copy of it |
+   | Original Switch backup ZIP | Not needed | An unmodified JKSV ZIP backup of the game from your Switch, used as a template |
+   | Output folder | An empty folder for the converted PC saves | Where `DSTS_Switch_Converted.zip` is created |
+
+   After you pick the input folder, the app shows which save files it found. It looks for `0000.bin`-style saves and `slot_0000.bin`-style slot files directly inside the folder; subfolders are not searched.
+3. **Convert and install**
+   - **Switch ➔ PC**: back up the game's existing `gamedata\savedata` folder, then copy the converted files into it.
+   - **PC ➔ Switch**: copy `DSTS_Switch_Converted.zip` to `sd:/JKSV/Digimon Story Time Stranger/` on your SD card and restore it with JKSV.
+
+### Where are my saves?
+
+- **PC (Steam)**: in Steam, right-click the game ➔ *Manage* ➔ *Browse local files*, then open `gamedata\savedata`. Typically:
+  `C:\Program Files (x86)\Steam\steamapps\common\Digimon Story Time Stranger\gamedata\savedata`
+- **Nintendo Switch**: back up the game with the [JKSV](https://github.com/J-D-K/JKSV) homebrew app. Backups are stored at `sd:/JKSV/Digimon Story Time Stranger/<backup name>/`. To get a ZIP backup (needed as the template for PC ➔ Switch), enable *Export to ZIP* in JKSV's settings before backing up.
+
+Close the game before copying save files.
 
 ## Build from Source
 
-If you want to run or build the application from source, you will need to have [Node.js](https://nodejs.org/) installed.
+You need [Node.js](https://nodejs.org/) installed.
 
 ### Setup
-1. Clone or download this directory.
+1. Clone or download this repository.
 2. Open a terminal in the project directory.
-3. Install the dependencies by running:
+3. Install the dependencies:
    ```bash
    npm install
    ```
 
 ### Running Locally
-To start the app in development mode without building:
+To start the app without building:
 ```bash
 npm start
 ```
 
 ### Building Executables
-To build the standalone executables for Windows and Linux:
-1. Make sure you have installed the developer dependencies:
-   ```bash
-   npm install --save-dev electron-builder
-   ```
-2. Run the build command (if configured in package.json):
-   ```bash
-   npm run build
-   ```
-   Alternatively, run electron-builder directly:
-   ```bash
-   npx electron-builder --linux --win
-   ```
+To build standalone executables for Windows and Linux:
+```bash
+npm run build
+```
 
-The compiled executables will be generated in the `dist` folder.
+The compiled executables are generated in the `dist` folder.
