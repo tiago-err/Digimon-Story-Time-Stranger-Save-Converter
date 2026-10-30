@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
@@ -7,10 +7,19 @@ const AdmZip = require('adm-zip');
 
 const DSTS_KEY = Buffer.from('33393632373736373534353535383833', 'hex'); // 3962776754555883
 
+// Main saves (e.g. 0000.bin) and slot files (e.g. slot_0000.bin) directly inside a folder
+function listSaves(folder) {
+  const files = fs.readdirSync(folder);
+  return {
+    mainFiles: files.filter(f => /^\d{4}\.bin$/.test(f)),
+    slotFiles: files.filter(f => /^slot_\d{4}\.bin$/.test(f))
+  };
+}
+
 function createWindow() {
   const win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 820,
+    height: 900,
     title: "DSTS Save Converter",
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -18,6 +27,12 @@ function createWindow() {
       contextIsolation: true
     },
     autoHideMenuBar: true,
+  });
+
+  // Open help links in the user's browser instead of a new app window
+  win.webContents.setWindowOpenHandler(({ url }) => {
+    if (url.startsWith('https://')) shell.openExternal(url);
+    return { action: 'deny' };
   });
 
   win.loadFile('index.html');
@@ -57,6 +72,21 @@ ipcMain.handle('select-zip', async () => {
   return result.filePaths[0];
 });
 
+ipcMain.handle('scan-folder', async (event, folder) => {
+  try {
+    return listSaves(folder);
+  } catch {
+    return { mainFiles: [], slotFiles: [] };
+  }
+});
+
+ipcMain.handle('open-folder', async (event, folder) => {
+  // Only directories: openPath would launch an executable file
+  if (folder && fs.existsSync(folder) && fs.statSync(folder).isDirectory()) {
+    await shell.openPath(folder);
+  }
+});
+
 ipcMain.handle('convert', async (event, args) => {
   const { inputFolder, outputFolder, templateZip, direction } = args;
   
@@ -67,12 +97,7 @@ ipcMain.handle('convert', async (event, args) => {
   }
 
   try {
-    const files = fs.readdirSync(inputFolder);
-    
-    // Find all main save files (e.g., 0000.bin, 0001.bin)
-    const mainFiles = files.filter(f => /^\d{4}\.bin$/.test(f));
-    // Find all slot files (e.g., slot_0000.bin, slot_0001.bin)
-    const slotFiles = files.filter(f => /^slot_\d{4}\.bin$/.test(f));
+    const { mainFiles, slotFiles } = listSaves(inputFolder);
     
     if (mainFiles.length === 0 && slotFiles.length === 0) {
       return { success: false, error: 'Could not find any .bin or slot_.bin files in the input folder.' };

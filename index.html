@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DSTS Save Editor</title>
+  <title>DSTS Save Converter</title>
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
@@ -11,59 +11,93 @@
   <div class="app-container">
     <header class="app-header">
       <h1>DSTS Save Converter</h1>
-      <p>Seamlessly convert your Digimon Story: Time Stranger save files between PC and Nintendo Switch.</p>
+      <p>Move your Digimon Story: Time Stranger progress between PC (Steam) and Nintendo Switch.</p>
     </header>
 
+    <div class="notice">
+      <strong>Back up first.</strong> Keep a copy of your original saves somewhere safe before converting, and close the game while copying files.
+    </div>
+
     <main class="main-content">
-      <div class="card direction-card">
-        <h2>Conversion Direction</h2>
-        <div class="radio-group">
-          <label class="radio-label">
+      <section class="card">
+        <h2><span class="step">1</span>Which way are you converting?</h2>
+        <div class="direction-group" role="radiogroup">
+          <label class="direction-option">
             <input type="radio" name="direction" value="switch-to-pc" checked>
-            <span class="custom-radio"></span>
-            Switch ➔ PC
+            <span class="direction-title">Switch ➔ PC</span>
+            <span class="direction-desc">Continue your Switch game on Steam.</span>
           </label>
-          <label class="radio-label">
+          <label class="direction-option">
             <input type="radio" name="direction" value="pc-to-switch">
-            <span class="custom-radio"></span>
-            PC ➔ Switch
+            <span class="direction-title">PC ➔ Switch <span class="badge">Untested</span></span>
+            <span class="direction-desc">Continue your Steam game on Switch.</span>
           </label>
         </div>
-      </div>
+      </section>
 
-      <div class="card folder-card">
-        <h2>Select Folders</h2>
-        
-        <div class="folder-selection">
-          <div class="folder-info">
-            <h3>Input Folder (Source)</h3>
-            <div id="input-path" class="path-display">No folder selected</div>
+      <section class="card">
+        <h2><span class="step">2</span>Choose your files</h2>
+
+        <div class="field">
+          <div class="field-row">
+            <div class="folder-info">
+              <h3 id="input-label"></h3>
+              <div id="input-path" class="path-display">No folder selected</div>
+            </div>
+            <button id="btn-input" class="btn primary-btn">Browse</button>
           </div>
-          <button id="btn-input" class="btn primary-btn">Browse</button>
+          <p id="input-hint" class="hint"></p>
+          <p id="input-scan" class="scan" aria-live="polite"></p>
         </div>
 
-        <div class="folder-selection" id="template-zip-section" style="display: none;">
-          <div class="folder-info">
-            <h3>Original Switch Backup ZIP (Template)</h3>
-            <div id="template-path" class="path-display">Required for JKSV ZIPs</div>
+        <div class="field" id="template-zip-section" hidden>
+          <div class="field-row">
+            <div class="folder-info">
+              <h3>Original Switch backup ZIP</h3>
+              <div id="template-path" class="path-display">No file selected</div>
+            </div>
+            <button id="btn-template" class="btn primary-btn">Browse ZIP</button>
           </div>
-          <button id="btn-template" class="btn primary-btn">Browse ZIP</button>
+          <p class="hint">
+            An unmodified JKSV ZIP backup of this game made on <em>your</em> Switch. It's used as a template, so the converted save keeps your console's own file layout.
+            Enable <em>Export to ZIP</em> in JKSV's settings, back up the game, and copy the ZIP from <code>sd:/JKSV/Digimon Story Time Stranger/</code> to this computer.
+          </p>
         </div>
 
-        <div class="folder-selection">
-          <div class="folder-info">
-            <h3>Output Folder (Destination)</h3>
-            <div id="output-path" class="path-display">No folder selected</div>
+        <div class="field">
+          <div class="field-row">
+            <div class="folder-info">
+              <h3>Output folder</h3>
+              <div id="output-path" class="path-display">No folder selected</div>
+            </div>
+            <button id="btn-output" class="btn primary-btn">Browse</button>
           </div>
-          <button id="btn-output" class="btn primary-btn">Browse</button>
+          <p id="output-hint" class="hint"></p>
         </div>
-      </div>
+      </section>
 
-      <div class="action-container">
-        <button id="btn-convert" class="btn convert-btn" disabled>Convert Saves</button>
-      </div>
+      <section class="card">
+        <h2><span class="step">3</span>Convert and install</h2>
+        <ol id="after-steps" class="after-steps"></ol>
+        <div class="action-container">
+          <button id="btn-convert" class="btn convert-btn" disabled>Convert Saves</button>
+        </div>
+        <div id="status-message" class="status-message" aria-live="polite"></div>
+        <div class="action-container">
+          <button id="btn-open-output" class="btn primary-btn" hidden>Open output folder</button>
+        </div>
+      </section>
 
-      <div id="status-message" class="status-message"></div>
+      <details class="card faq">
+        <summary>Where do I find my saves?</summary>
+        <h3>PC (Steam)</h3>
+        <p>In Steam, right-click the game ➔ <em>Manage</em> ➔ <em>Browse local files</em>, then open <code>gamedata\savedata</code>. Typically:</p>
+        <p><code>C:\Program Files (x86)\Steam\steamapps\common\Digimon Story Time Stranger\gamedata\savedata</code></p>
+        <h3>Nintendo Switch (JKSV)</h3>
+        <p>Back up the game with the <a href="https://github.com/J-D-K/JKSV" target="_blank" rel="noopener">JKSV</a> homebrew app. Backups are stored on the SD card at <code>sd:/JKSV/Digimon Story Time Stranger/&lt;backup name&gt;/</code>.</p>
+        <h3>Which files are converted?</h3>
+        <p>Every <code>0000.bin</code>-style save and every <code>slot_0000.bin</code>-style slot file directly inside the input folder. Subfolders are not searched.</p>
+      </details>
     </main>
   </div>
   <script src="renderer.js"></script>
